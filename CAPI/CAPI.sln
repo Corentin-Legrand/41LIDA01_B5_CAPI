@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAPI_VIEW", "CAPI_VIEW\CAPI_VIEW.csproj", "{38D7FC4E-A671-44B6-96F0-5C4B020D976E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAPI_MODEL", "CAPI_MODEL\CAPI_MODEL.csproj", "{EF38C7C9-5A67-4AC0-A190-8AAAE5DEB69D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{38D7FC4E-A671-44B6-96F0-5C4B020D976E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38D7FC4E-A671-44B6-96F0-5C4B020D976E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38D7FC4E-A671-44B6-96F0-5C4B020D976E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38D7FC4E-A671-44B6-96F0-5C4B020D976E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF38C7C9-5A67-4AC0-A190-8AAAE5DEB69D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF38C7C9-5A67-4AC0-A190-8AAAE5DEB69D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF38C7C9-5A67-4AC0-A190-8AAAE5DEB69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF38C7C9-5A67-4AC0-A190-8AAAE5DEB69D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
