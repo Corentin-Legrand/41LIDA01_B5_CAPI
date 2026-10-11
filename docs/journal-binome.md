@@ -1,8 +1,13 @@
 R0 : 
-Pilote : Valentin
-Copilote : Corentin
+Pilote : B
+Copilote : A
 
 R1 : 
-Pilote : Corentin
-Copilote : Valentin
+Pilote : A
+Copilote : B
+
+Ordre alphabétique :
+
+- Corentin : A
+- Valentin : B
 
