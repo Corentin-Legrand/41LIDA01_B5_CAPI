@@ -1,0 +1,38 @@
+<UserControl x:Class="CAPI_APP.Views.SetupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:CAPI_APP.ViewModels"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=viewModels:SetupViewModel}">
+    <StackPanel Margin="24">
+        <TextBlock Text="Configuration de la partie" FontSize="22" FontWeight="Bold" />
+        <TextBlock Text="Saisissez le pseudo de chaque joueur, puis lancez la partie."
+                   Margin="0,4,0,20" Foreground="Gray" TextWrapping="Wrap" />
+
+        <StackPanel Orientation="Horizontal">
+            <TextBox Width="240" VerticalContentAlignment="Center" Padding="4"
+                     Text="{Binding NewPlayerName, UpdateSourceTrigger=PropertyChanged}">
+                <TextBox.InputBindings>
+                    <KeyBinding Key="Enter" Command="{Binding AddPlayerCommand}" />
+                </TextBox.InputBindings>
+            </TextBox>
+            <Button Content="Ajouter le joueur" Command="{Binding AddPlayerCommand}"
+                    Margin="8,0,0,0" Padding="12,4" />
+        </StackPanel>
+
+        <TextBlock Text="Joueurs de la partie" FontWeight="Bold" Margin="0,20,0,4" />
+        <ListBox ItemsSource="{Binding Players}" Height="180">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Button Content="Lancer la partie" Command="{Binding StartGameCommand}"
+                Margin="0,20,0,0" Padding="12,8" HorizontalAlignment="Left" />
+        <TextBlock Text="La partie demande au moins deux joueurs." Margin="0,6,0,0" Foreground="Gray" />
+    </StackPanel>
+</UserControl>
