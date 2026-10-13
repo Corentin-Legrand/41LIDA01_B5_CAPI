@@ -1,0 +1,18 @@
+<Application x:Class="CAPI_APP.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewModels="clr-namespace:CAPI_APP.ViewModels"
+             xmlns:views="clr-namespace:CAPI_APP.Views"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <DataTemplate DataType="{x:Type viewModels:SetupViewModel}">
+            <views:SetupView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:VotingViewModel}">
+            <views:VotingView />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type viewModels:RevealViewModel}">
+            <views:RevealView />
+        </DataTemplate>
+    </Application.Resources>
+</Application>
