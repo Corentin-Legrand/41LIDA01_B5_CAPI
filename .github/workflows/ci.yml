@@ -1,34 +1,35 @@
 name: CI
 
-# Déclenchement : à chaque push sur main et à chaque pull request qui vise main.
+# On lance la CI dans deux cas : quand on pousse sur main, et quand on ouvre ou met à jour une PR vers main.
+# Comme ça, on voit si les tests passent avant de fusionner.
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-# Droits minimum : le workflow a seulement besoin de lire le code du dépôt.
+# On donne seulement le droit de lire le dépôt : la CI n'a pas besoin de modifier quoi que ce soit.
 permissions:
   contents: read
 
 jobs:
   test:
-    # Machine Linux : suffisant car on ne teste que CAPI_CORE et CAPI_TESTS.
-    # L'application WPF (CAPI_APP) ne compile que sous Windows, on ne la construit donc pas ici.
+    # On utilise une machine Linux. Ça suffit parce qu'on teste seulement CAPI_CORE (la logique du jeu).
+    # L'interface WPF ne marche que sous Windows, donc on ne la compile pas ici.
     runs-on: ubuntu-latest
 
     steps:
-      # Récupère le code du dépôt sur la machine de la CI.
-      # Action épinglée sur le SHA du commit de la version v5.1.0 (et non sur un tag qui peut bouger).
+      # Étape 1 : on télécharge le code du dépôt sur la machine.
+      # On fixe la version exacte de l'action avec son identifiant de commit (SHA) pour éviter qu'elle change sans qu'on le sache.
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      # Installe le SDK .NET 10, nécessaire pour compiler et lancer les tests.
-      # Action épinglée sur le SHA du commit de la version v5.4.0.
+      # Étape 2 : on installe .NET 10, la version utilisée par notre projet.
+      # Même chose : version fixée par son SHA.
       - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
         with:
           dotnet-version: "10.0.x"
 
-      # Compile CAPI_CORE et le projet de tests, puis lance tous les tests xUnit.
-      # Si un seul test échoue, la commande échoue et la CI devient rouge.
+      # Étape 3 : on compile et on lance nos tests xUnit.
+      # Si un seul test échoue, cette étape échoue et la CI passe au rouge.
       - name: Tests du moteur de règles
         run: dotnet test CAPI/CAPI_TESTS/CAPI_TESTS.csproj
