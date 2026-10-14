@@ -12,6 +12,8 @@ public class MedianRule : IValidationRule
     /// <inheritdoc />
     public VoteResult Evaluate(IReadOnlyList<Card> votes)
     {
-        throw new NotImplementedException();
+        List<Card> sorted = votes.OrderBy(card => card.Value).ToList();
+        // Count / 2 is the middle index for an odd count and the higher middle index for an even count.
+        return new VoteResult(VoteOutcome.Validated, sorted[sorted.Count / 2]);
     }
 }

@@ -25,8 +25,10 @@ oui fais le renommage CAPI\_VIEW → CAPI\_APP et CAPI\_MODEL → CAPI\_CORE, su
 
 &#x20; comportement pour le moment
 
-#PR1
-Je veux que tu déplace les commentaires en français du fichier de test unitaire pour les placer dans le readme a la racine du repo, tu peux indiquer pour chaque cas de test à quoi il correspond dans la table de décision    
+\#PR1
+Je veux que tu déplace les commentaires en français du fichier de test unitaire pour les placer dans le readme a la racine du repo, tu peux indiquer pour chaque cas de test à quoi il correspond dans la table de décision
 
 &#x20; (non disponible dans ce repo pour le moment)
+#US6 et 7 
+Implémente les méthodes du moteur de règle de vote (pour le momement elles lèves toutes des excception à leur appel) pour respecter les cas de test. Ne modifie pas les test fournis une implémentation qui passe les test
 
