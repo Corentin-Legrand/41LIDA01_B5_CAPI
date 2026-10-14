@@ -11,6 +11,9 @@ public class StrictRule : IValidationRule
     /// <inheritdoc />
     public VoteResult Evaluate(IReadOnlyList<Card> votes)
     {
-        throw new NotImplementedException();
+        Card first = votes[0];
+        return votes.All(card => card == first)
+            ? new VoteResult(VoteOutcome.Validated, first)
+            : new VoteResult(VoteOutcome.Revote);
     }
 }

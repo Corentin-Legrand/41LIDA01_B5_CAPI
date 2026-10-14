@@ -6,33 +6,69 @@
              xmlns:viewModels="clr-namespace:CAPI_APP.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:SetupViewModel}">
-    <StackPanel Margin="24">
-        <TextBlock Text="Configuration de la partie" FontSize="22" FontWeight="Bold" />
-        <TextBlock Text="Saisissez le pseudo de chaque joueur, puis lancez la partie."
-                   Margin="0,4,0,20" Foreground="Gray" TextWrapping="Wrap" />
+    <Grid Margin="24">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="24" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <TextBox Width="240" VerticalContentAlignment="Center" Padding="4"
-                     Text="{Binding NewPlayerName, UpdateSourceTrigger=PropertyChanged}">
-                <TextBox.InputBindings>
-                    <KeyBinding Key="Enter" Command="{Binding AddPlayerCommand}" />
-                </TextBox.InputBindings>
-            </TextBox>
-            <Button Content="Ajouter le joueur" Command="{Binding AddPlayerCommand}"
-                    Margin="8,0,0,0" Padding="12,4" />
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Configuration de la partie" FontSize="22" FontWeight="Bold" />
+            <TextBlock Text="Saisissez le pseudo de chaque joueur, choisissez la règle, puis lancez la partie."
+                       Margin="0,4,0,20" Foreground="Gray" TextWrapping="Wrap" />
+
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="240" VerticalContentAlignment="Center" Padding="4"
+                         Text="{Binding NewPlayerName, UpdateSourceTrigger=PropertyChanged}">
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding AddPlayerCommand}" />
+                    </TextBox.InputBindings>
+                </TextBox>
+                <Button Content="Ajouter le joueur" Command="{Binding AddPlayerCommand}"
+                        Margin="8,0,0,0" Padding="12,4" />
+            </StackPanel>
+            <TextBlock Text="Ce pseudo est déjà utilisé par un autre joueur de la partie."
+                       Foreground="Firebrick" Margin="0,4,0,0"
+                       Visibility="{Binding IsNewPlayerNameTaken, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <TextBlock Text="Joueurs de la partie" FontWeight="Bold" Margin="0,20,0,4" />
+            <ListBox ItemsSource="{Binding Players}" Height="140">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="Règle de validation (à partir du deuxième tour)" FontWeight="Bold" Margin="0,20,0,4" />
+            <RadioButton GroupName="Rule" Content="Stricte (unanimité)" IsChecked="True" />
+            <RadioButton GroupName="Rule" Content="Médiane" Margin="0,4,0,0"
+                         IsChecked="{Binding IsMedianRuleSelected}" />
+
+            <Button Content="Lancer la partie" Command="{Binding StartGameCommand}"
+                    Margin="0,20,0,0" Padding="12,8" HorizontalAlignment="Left" />
+            <TextBlock Text="La partie demande au moins deux joueurs." Margin="0,6,0,0" Foreground="Gray" />
         </StackPanel>
 
-        <TextBlock Text="Joueurs de la partie" FontWeight="Bold" Margin="0,20,0,4" />
-        <ListBox ItemsSource="{Binding Players}" Height="180">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-
-        <Button Content="Lancer la partie" Command="{Binding StartGameCommand}"
-                Margin="0,20,0,0" Padding="12,8" HorizontalAlignment="Left" />
-        <TextBlock Text="La partie demande au moins deux joueurs." Margin="0,6,0,0" Foreground="Gray" />
-    </StackPanel>
+        <StackPanel Grid.Column="2">
+            <TextBlock Text="Backlog chargé" FontSize="22" FontWeight="Bold" />
+            <TextBlock Text="Fonctionnalités à estimer, dans l'ordre du vote."
+                       Margin="0,4,0,20" Foreground="Gray" TextWrapping="Wrap" />
+            <ItemsControl ItemsSource="{Binding Features}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,0,0,10">
+                            <TextBlock FontWeight="Bold">
+                                <Run Text="{Binding Id, Mode=OneWay}" />
+                                <Run Text="–" />
+                                <Run Text="{Binding Title, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Text="{Binding Description}" Foreground="Gray" TextWrapping="Wrap" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </StackPanel>
+    </Grid>
 </UserControl>

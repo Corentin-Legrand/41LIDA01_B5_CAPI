@@ -11,6 +11,7 @@ namespace CAPI_CORE.Rules;
 public class RuleEngine
 {
     private readonly IValidationRule rule;
+    private readonly IValidationRule firstRoundRule = new StrictRule();
 
     /// <summary>
     /// Initializes a new <see cref="RuleEngine"/> applying the given rule from the second round onwards.
@@ -29,6 +30,23 @@ public class RuleEngine
     /// <returns>The decision taken for the round and, when validated, the retained card.</returns>
     public VoteResult Evaluate(IReadOnlyList<Card> votes, int roundNumber)
     {
-        throw new NotImplementedException();
+        // Checked first: All() is true on an empty list, which would otherwise trigger a coffee break.
+        if (votes.Count == 0)
+        {
+            return new VoteResult(VoteOutcome.Revote);
+        }
+
+        if (votes.All(card => card.Label == Card.CoffeeLabel))
+        {
+            return new VoteResult(VoteOutcome.CoffeeBreak);
+        }
+
+        // "?" and a coffee card played by only some players carry no value: no estimate can be computed.
+        if (votes.Any(card => card.Value is null))
+        {
+            return new VoteResult(VoteOutcome.Revote);
+        }
+
+        return roundNumber == 1 ? firstRoundRule.Evaluate(votes) : rule.Evaluate(votes);
     }
 }

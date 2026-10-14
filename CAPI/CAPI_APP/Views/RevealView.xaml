@@ -4,30 +4,109 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:CAPI_APP.ViewModels"
+             xmlns:rules="clr-namespace:CAPI_CORE.Rules;assembly=CAPI_CORE"
+             xmlns:controls="clr-namespace:CAPI_APP.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:RevealViewModel}">
-    <StackPanel Margin="24">
-        <TextBlock Text="Révélation des votes" FontSize="22" FontWeight="Bold" />
-        <TextBlock Text="Voici la carte jouée par chaque joueur." Margin="0,4,0,20" Foreground="Gray" />
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <TextBlock FontSize="22" FontWeight="Bold">
+                <Run Text="Révélation des votes –" />
+                <Run Text="{Binding Feature.Title, Mode=OneWay}" />
+            </TextBlock>
+            <TextBlock Text="Voici la carte jouée par chaque joueur." Margin="0,4,0,20" Foreground="Gray" />
 
-        <ItemsControl ItemsSource="{Binding Votes}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="6" Width="104">
-                        <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Height="104">
-                            <TextBlock Text="{Binding Value.Label}" FontSize="22"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
-                        </Border>
-                        <TextBlock Text="{Binding Key.Name}" Margin="0,6,0,0"
-                                   HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
-                    </StackPanel>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
-    </StackPanel>
+            <ItemsControl ItemsSource="{Binding Votes}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="6" Width="104">
+                            <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="4" Height="104">
+                                <TextBlock Text="{Binding Value.Label}" FontSize="22"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="{Binding Key.Name}" Margin="0,6,0,0"
+                                       HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <TextBlock FontSize="16" FontWeight="Bold" Margin="0,20,0,0" TextWrapping="Wrap">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Result.Outcome}" Value="{x:Static rules:VoteOutcome.Validated}">
+                                <Setter Property="Text"
+                                        Value="{Binding Result.RetainedCard.Label, StringFormat='Fonctionnalité validée, difficulté retenue : {0}'}" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Result.Outcome}" Value="{x:Static rules:VoteOutcome.Revote}">
+                                <Setter Property="Text" Value="Pas de validation : l'équipe revote." />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding Result.Outcome}" Value="{x:Static rules:VoteOutcome.CoffeeBreak}">
+                                <Setter Property="Text" Value="Pause café : la partie est interrompue." />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <TextBlock Margin="0,6,0,0" TextWrapping="Wrap"
+                       Visibility="{Binding IsRevoteForQuestionMark, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Run Text="La carte « ? » a été jouée : la fonctionnalité doit être expliquée avant de revoter. Explications demandées par :" />
+                <Run Text="{Binding QuestionMarkPlayerNames, Mode=OneWay}" FontWeight="Bold" />
+            </TextBlock>
+            <TextBlock Margin="0,6,0,0" TextWrapping="Wrap"
+                       Text="La carte café a été jouée sans que tous les joueurs la choisissent : aucune difficulté ne peut être retenue, l'équipe revote."
+                       Visibility="{Binding IsRevoteForCoffee, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            <TextBlock Margin="0,6,0,0" TextWrapping="Wrap"
+                       Text="Les votes ne permettent pas de valider : les joueurs aux votes extrêmes s'expriment, puis l'équipe revote."
+                       Visibility="{Binding IsRevoteForDisagreement, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+                <Button Content="Continuer" Command="{Binding StartNextRoundCommand}" Padding="12,8" Margin="0,0,8,0">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding HasGameEnded}" Value="True">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <controls:ConfirmationButton Content="Retour au menu" Command="{Binding ReturnToSetupCommand}"
+                                             ConfirmationMessage="Revenir au menu ? Toute la progression de la partie en cours sera perdue."
+                                             Padding="12,8" />
+            </StackPanel>
+
+            <StackPanel Margin="0,20,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasGameEnded}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="Fin de la partie – estimations validées" FontSize="18" FontWeight="Bold" />
+                <ItemsControl ItemsSource="{Binding Estimates}" Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <Run Text="{Binding Key.Title, Mode=OneWay}" />
+                                <Run Text=":" />
+                                <Run Text="{Binding Value.Label, Mode=OneWay}" FontWeight="Bold" />
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

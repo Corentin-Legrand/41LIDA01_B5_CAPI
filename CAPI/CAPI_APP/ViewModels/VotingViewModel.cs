@@ -10,7 +10,7 @@ namespace CAPI_APP.ViewModels;
 /// <remarks>
 /// Author: Corentin Legrand
 /// </remarks>
-public partial class VotingViewModel : ObservableObject
+public partial class VotingViewModel : InGameViewModel
 {
     private readonly GameSession session;
     private int currentPlayerIndex = 0;
@@ -27,9 +27,25 @@ public partial class VotingViewModel : ObservableObject
     public IReadOnlyList<Card> Cards { get; } = GetDeck();
 
     /// <summary>
-    /// Occurs when every player has played a card and the votes are revealed.
+    /// Gets the feature being voted on.
     /// </summary>
-    public event EventHandler<IReadOnlyDictionary<Player, Card>>? VoteRevealed;
+    public Feature CurrentFeature
+    {
+        get { return session.CurrentFeature; }
+    }
+
+    /// <summary>
+    /// Gets the number of the round being played on the current feature.
+    /// </summary>
+    public int RoundNumber
+    {
+        get { return session.RoundNumber; }
+    }
+
+    /// <summary>
+    /// Occurs when every player has played a card and the votes can be revealed.
+    /// </summary>
+    public event EventHandler? VoteRevealed;
 
     /// <summary>
     /// Initializes a new <see cref="VotingViewModel"/> for the given game, starting with its first player.
@@ -52,7 +68,7 @@ public partial class VotingViewModel : ObservableObject
     {
         if (session.HasEveryPlayerVoted)
         {
-            VoteRevealed?.Invoke(this, session.RevealVote());
+            VoteRevealed?.Invoke(this, EventArgs.Empty);
         }
         else
         {
@@ -75,8 +91,8 @@ public partial class VotingViewModel : ObservableObject
             new("20", 20),
             new("40", 40),
             new("100", 100),
-            new("?"),
-            new("Café")
+            new(Card.QuestionMarkLabel),
+            new(Card.CoffeeLabel)
         };
     }
 }

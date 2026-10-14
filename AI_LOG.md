@@ -25,8 +25,19 @@ oui fais le renommage CAPI\_VIEW → CAPI\_APP et CAPI\_MODEL → CAPI\_CORE, su
 
 &#x20; comportement pour le moment
 
-#PR1
-Je veux que tu déplace les commentaires en français du fichier de test unitaire pour les placer dans le readme a la racine du repo, tu peux indiquer pour chaque cas de test à quoi il correspond dans la table de décision    
+\#PR1
+Je veux que tu déplace les commentaires en français du fichier de test unitaire pour les placer dans le readme a la racine du repo, tu peux indiquer pour chaque cas de test à quoi il correspond dans la table de décision
 
 &#x20; (non disponible dans ce repo pour le moment)
+#US6 et 7 
+Implémente les méthodes du moteur de règle de vote (pour le momement elles lèves toutes des excception à leur appel) pour respecter les cas de test. Ne modifie pas les test fournis une implémentation qui passe les test.
+Pour le cas niche ou la liste est vide les tests plantent par sécurité en cas de lsite vide il faut toujours revote.
+
+Bien maintenant je veux que tu fasse le lien avec le ViewModel et la Vue tout court pour rendre fonctionnel le système de vote dans l'application elle même garde le VM aussi léger que possible, et créer un mock de backlog qui se charge au lancement de l'application affin que l'on puisse tester le moteur de règle.
+
+IsVoteUnanimous : n'est plus utilisé, le moteur s'en charge. Le supprimer ? Oui supprime le
+
+Ok je voudrais apporter des changement mineurs au fonctionnement de la vue. D'abord garder un bouton dans la reveal view et la voting view pour revenir à la setup view (revenir au menu avec perte de toute la progression en cours donc afficher une messagebox pour demander confirmation). Ensuite pour les cas ou l'on a juste un vote café ou un vote ? que le message afficher dans la reaveal view soit plus explicite (dire que l'on revote car il y'a la présence de la carte en question et dans le cas du vote ? préciser que le joueur ayant voter ? aimerais obtenir des explications)
+
+Ajoute juste une petite logique de gestion des erreurs pour faire en sorte que l'on ne puisse pas ajouter un jouer ayant le même nom que un autre joueur deja présent dans la partie
 

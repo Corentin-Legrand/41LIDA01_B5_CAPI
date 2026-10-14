@@ -9,6 +9,16 @@ namespace CAPI_CORE;
 public readonly struct Card : IEquatable<Card>
 {
     /// <summary>
+    /// The label of the card played by a player who wants explanations on the feature.
+    /// </summary>
+    public const string QuestionMarkLabel = "?";
+
+    /// <summary>
+    /// The label of the card played by a player who wants a break.
+    /// </summary>
+    public const string CoffeeLabel = "Café";
+
+    /// <summary>
     /// Gets the label displayed on the card.
     /// </summary>
     public string Label { get; init; }

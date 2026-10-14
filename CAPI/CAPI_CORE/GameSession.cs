@@ -1,26 +1,66 @@
+using CAPI_CORE.Rules;
+
 namespace CAPI_CORE;
 
 /// <summary>
-/// Represents a running planning poker game: its players and the votes of the current round.
+/// Represents a running planning poker game: its players, the features to estimate,
+/// the votes of the current round and the estimates already validated.
 /// </summary>
 /// <remarks>
 /// Author: Corentin Legrand
 /// </remarks>
 public class GameSession
 {
-    private const int SingleDistinctVote = 1;
+    private const int FirstRoundNumber = 1;
 
     private readonly Dictionary<Player, Card> votes = new();
     private readonly List<Player> players = new();
+    private readonly List<Feature> features = new();
+    private readonly Dictionary<Feature, Card> estimates = new();
+    private readonly RuleEngine ruleEngine;
+    private int currentFeatureIndex = 0;
     // private readonly Backlog backlog = new(); // Enable once Backlog is implemented.
 
     /// <summary>
-    /// Initializes a new <see cref="GameSession"/> for the given players.
+    /// Initializes a new <see cref="GameSession"/> for the given players, features and validation rule.
     /// </summary>
     /// <param name="players">The players taking part in the game.</param>
-    public GameSession(IEnumerable<Player> players)
+    /// <param name="features">The features to estimate, in the order they are voted on.</param>
+    /// <param name="rule">The rule chosen to conclude the rounds from the second round onwards.</param>
+    public GameSession(IEnumerable<Player> players, IEnumerable<Feature> features, IValidationRule rule)
     {
         this.players.AddRange(players);
+        this.features.AddRange(features);
+        ruleEngine = new RuleEngine(rule);
+    }
+
+    /// <summary>
+    /// Gets the feature currently being voted on.
+    /// </summary>
+    public Feature CurrentFeature
+    {
+        get { return features[currentFeatureIndex]; }
+    }
+
+    /// <summary>
+    /// Gets the number of the current round on the current feature, starting at 1.
+    /// </summary>
+    public int RoundNumber { get; private set; } = FirstRoundNumber;
+
+    /// <summary>
+    /// Gets a value indicating whether every feature of the backlog has been estimated.
+    /// </summary>
+    public bool IsBacklogEstimated
+    {
+        get { return currentFeatureIndex >= features.Count; }
+    }
+
+    /// <summary>
+    /// Gets the card retained for each feature validated so far.
+    /// </summary>
+    public IReadOnlyDictionary<Feature, Card> Estimates
+    {
+        get { return estimates; }
     }
 
     /// <summary>
@@ -37,14 +77,6 @@ public class GameSession
     public bool HasEveryPlayerVoted
     {
         get { return players.All(votes.ContainsKey); }
-    }
-
-    /// <summary>
-    /// Gets a value indicating whether every player of the game played the same card in the current round.
-    /// </summary>
-    public bool IsVoteUnanimous
-    {
-        get { return HasEveryPlayerVoted && votes.Values.Distinct().Count() == SingleDistinctVote; }
     }
 
     /// <summary>
@@ -73,5 +105,32 @@ public class GameSession
         }
 
         return new Dictionary<Player, Card>(votes);
+    }
+
+    /// <summary>
+    /// Concludes the current round with the rule engine and prepares the next one: a validated feature
+    /// is recorded and the game moves to the next feature, a revote starts a new round on the same feature.
+    /// </summary>
+    /// <returns>The decision taken for the round.</returns>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when at least one player of the game has not voted yet.
+    /// </exception>
+    public VoteResult ConcludeRound()
+    {
+        VoteResult result = ruleEngine.Evaluate(RevealVote().Values.ToList(), RoundNumber);
+
+        if (result.Outcome == VoteOutcome.Validated)
+        {
+            estimates[CurrentFeature] = result.RetainedCard!.Value;
+            currentFeatureIndex++;
+            RoundNumber = FirstRoundNumber;
+        }
+        else if (result.Outcome == VoteOutcome.Revote)
+        {
+            RoundNumber++;
+        }
+
+        votes.Clear();
+        return result;
     }
 }
