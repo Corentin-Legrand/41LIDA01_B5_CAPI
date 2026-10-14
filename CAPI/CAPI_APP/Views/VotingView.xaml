@@ -4,11 +4,17 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:CAPI_APP.ViewModels"
+             xmlns:controls="clr-namespace:CAPI_APP.Controls"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:VotingViewModel}">
     <StackPanel Margin="24">
-        <TextBlock Text="Tour de vote" FontSize="22" FontWeight="Bold" />
-        <TextBlock Margin="0,4,0,20" Foreground="Gray">
+        <TextBlock FontSize="22" FontWeight="Bold">
+            <Run Text="{Binding CurrentFeature.Title, Mode=OneWay}" />
+            <Run Text="– tour" />
+            <Run Text="{Binding RoundNumber, Mode=OneWay}" />
+        </TextBlock>
+        <TextBlock Text="{Binding CurrentFeature.Description}" Margin="0,4,0,0" TextWrapping="Wrap" />
+        <TextBlock Margin="0,12,0,20" Foreground="Gray">
             <Run Text="Au tour de" />
             <Run Text="{Binding CurrentPlayer.Name}" FontWeight="Bold" Foreground="Black" />
             <Run Text="de choisir sa carte, sans la montrer aux autres joueurs." />
@@ -29,5 +35,9 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <controls:ConfirmationButton Content="Retour au menu" Command="{Binding ReturnToSetupCommand}"
+                                     ConfirmationMessage="Revenir au menu ? Toute la progression de la partie en cours sera perdue."
+                                     Margin="0,20,0,0" Padding="12,8" HorizontalAlignment="Left" />
     </StackPanel>
 </UserControl>

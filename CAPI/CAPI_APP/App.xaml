@@ -5,6 +5,7 @@
              xmlns:views="clr-namespace:CAPI_APP.Views"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <DataTemplate DataType="{x:Type viewModels:SetupViewModel}">
             <views:SetupView />
         </DataTemplate>

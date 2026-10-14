@@ -10,8 +10,6 @@ namespace CAPI_CORE.Rules;
 /// </remarks>
 public class RuleEngine
 {
-    private const string CoffeeLabel = "Café";
-
     private readonly IValidationRule rule;
     private readonly IValidationRule firstRoundRule = new StrictRule();
 
@@ -38,7 +36,7 @@ public class RuleEngine
             return new VoteResult(VoteOutcome.Revote);
         }
 
-        if (votes.All(card => card.Label == CoffeeLabel))
+        if (votes.All(card => card.Label == Card.CoffeeLabel))
         {
             return new VoteResult(VoteOutcome.CoffeeBreak);
         }

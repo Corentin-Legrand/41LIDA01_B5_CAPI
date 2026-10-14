@@ -1,3 +1,4 @@
+using CAPI_APP.Mocks;
 using CAPI_CORE;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -18,24 +19,33 @@ public partial class MainViewModel : ObservableObject
     public partial ObservableObject CurrentViewModel { get; set; }
 
     /// <summary>
-    /// Initializes a new <see cref="MainViewModel"/> showing the setup screen.
+    /// Initializes a new <see cref="MainViewModel"/> showing the setup screen with the mock backlog loaded.
     /// </summary>
     public MainViewModel()
     {
-        SetupViewModel setup = new();
-        setup.GameStarted += OnGameStarted;
-        CurrentViewModel = setup;
+        CurrentViewModel = CreateSetup();
     }
 
-    private void OnGameStarted(object? sender, GameSession session)
+    private SetupViewModel CreateSetup()
+    {
+        SetupViewModel setup = new(BacklogMock.GetFeatures());
+        setup.GameStarted += (_, session) => ShowVoting(session);
+        return setup;
+    }
+
+    private void ShowVoting(GameSession session)
     {
         VotingViewModel voting = new(session);
-        voting.VoteRevealed += OnVoteRevealed;
+        voting.VoteRevealed += (_, _) => ShowReveal(session);
+        voting.ReturnToSetupRequested += (_, _) => CurrentViewModel = CreateSetup();
         CurrentViewModel = voting;
     }
 
-    private void OnVoteRevealed(object? sender, IReadOnlyDictionary<Player, Card> votes)
+    private void ShowReveal(GameSession session)
     {
-        CurrentViewModel = new RevealViewModel(votes);
+        RevealViewModel reveal = new(session);
+        reveal.NextRoundRequested += (_, _) => ShowVoting(session);
+        reveal.ReturnToSetupRequested += (_, _) => CurrentViewModel = CreateSetup();
+        CurrentViewModel = reveal;
     }
 }
