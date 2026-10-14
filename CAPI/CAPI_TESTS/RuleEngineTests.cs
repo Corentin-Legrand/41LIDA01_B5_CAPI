@@ -45,6 +45,7 @@ public class RuleEngineTests
     [Fact]
     public void Row3_Median_Round1_DifferentVotes_Revote()
     {
+        // Why it matters: in round 1 the median rule must require unanimity like the strict rule (subject rule).
         // Arrange
         RuleEngine engine = new(new MedianRule());
         Card[] votes = { new("8", 8), new("8", 8), new("5", 5) };
@@ -88,6 +89,7 @@ public class RuleEngineTests
     [Fact]
     public void Row6_Median_Round2_QuestionMark_Revote()
     {
+        // Why it matters: "?" carries no value, so no median can be computed (decision of the table).
         // Arrange
         RuleEngine engine = new(new MedianRule());
         Card[] votes = { new("?"), new("5", 5), new("8", 8) };
@@ -102,6 +104,7 @@ public class RuleEngineTests
     [Fact]
     public void Row7_Median_Round2_EvenCount_ValidatedWithHigherMiddleCard()
     {
+        // Why it matters: with an even count we keep the higher middle card to avoid underestimating (decision of the table).
         // Arrange
         RuleEngine engine = new(new MedianRule());
         Card[] votes = { new("5", 5), new("5", 5), new("8", 8), new("8", 8) };
