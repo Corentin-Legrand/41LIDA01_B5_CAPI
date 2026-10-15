@@ -10,6 +10,12 @@ namespace CAPI_CORE.Rules;
 public class MedianRule : IValidationRule
 {
     /// <inheritdoc />
+    public string Name
+    {
+        get { return ValidationRules.MedianRuleName; }
+    }
+
+    /// <inheritdoc />
     public VoteResult Evaluate(IReadOnlyList<Card> votes)
     {
         List<Card> sorted = votes.OrderBy(card => card.Value).ToList();

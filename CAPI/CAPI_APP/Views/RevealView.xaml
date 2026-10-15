@@ -95,6 +95,12 @@
                     </Style>
                 </StackPanel.Style>
                 <TextBlock Text="Fin de la partie – estimations validées" FontSize="18" FontWeight="Bold" />
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <Button Content="Sauvegarder la partie (JSON)" Command="{Binding SaveGameCommand}" Padding="12,8"
+                            Visibility="{Binding IsCoffeeBreak, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                    <Button Content="Exporter les estimations (JSON)" Command="{Binding ExportEstimatesCommand}" Padding="12,8"
+                            Visibility="{Binding IsBacklogEstimated, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                </StackPanel>
                 <ItemsControl ItemsSource="{Binding Estimates}" Margin="0,8,0,0">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>

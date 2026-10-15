@@ -1,0 +1,35 @@
+{
+  "regle": "mediane",
+  "fonctionnalites": [
+    {
+      "id": "F-01",
+      "titre": "Créer un compte",
+      "description": "Un visiteur crée un compte avec son e-mail et un mot de passe.",
+      "difficulte": 3
+    },
+    {
+      "id": "F-02",
+      "titre": "Se connecter",
+      "description": "Un utilisateur inscrit se connecte avec ses identifiants.",
+      "difficulte": 5
+    },
+    {
+      "id": "F-03",
+      "titre": "Rechercher un produit",
+      "description": "Un utilisateur recherche un produit par mot-clé.",
+      "difficulte": 8
+    },
+    {
+      "id": "F-04",
+      "titre": "Ajouter au panier",
+      "description": "Un utilisateur ajoute un produit à son panier.",
+      "difficulte": 3
+    },
+    {
+      "id": "F-05",
+      "titre": "Payer la commande",
+      "description": "Un utilisateur paie le contenu de son panier par carte bancaire.",
+      "difficulte": 13
+    }
+  ]
+}

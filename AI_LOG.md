@@ -1,43 +1,70 @@
-Liste des prompt a Claude Code (Sonnet 5.5 en mode agent avec validation humaine pour les write et commande shell) :
-Ok tu vas m'aider à implémenter une application de planning poker en C# .NET 10 et WPF pour le front. Le projet contient deux projet le projet APP contient le front (Vue) et le VM (Vue Modele) car cela est l'arhtiecture
+# AI_LOG.md : journal d'usage de l'IA
 
-&#x20; favorisée par .NET et WPF les modèles et la logique de décision métier seront eu dans le projet CORE. Tu trouveras toutes les instruction sur les convention de code dans le fichier "Convention de code et bonnes pratiques
+> À placer à la racine du dépôt. À remplir **au fil de l'eau**, pas en fin de projet. Une entrée par tâche (pas par message), en 5 lignes.
+> Qui a fait la demande, les fichiers touchés et les commits se retrouvent dans l'historique Git : ne les recopiez pas.
 
+## Outils utilisés (à remplir une fois)
 
+| Outil | Modèle (si connu) | Mode (autocomplétion, chat, agent) |
+|---|---|---|
+| Claude Code | Claude Sonnet 5.5 | agent, avec validation humaine de chaque écriture de fichier et de chaque commande |
+| Claude (claude.ai) | Claude Opus 5.5 | agent |
 
-Tu implémentaras uniquement ce que je te dirais de faire et quand je te dirais de la faire je veux garder la main ne prend pas d'initative sans me le demander j'ai accepter le projet de test et le community toolkit car ce
+Fichier d'instructions pour agent versionné (`CLAUDE.md`, `AGENTS.md`...) : non. Nos conventions de code (`CAPI/Conventions de code et bonnes pratiques.md`) sont données à l'agent dans la demande.
 
-&#x20; sont des choix d'archiutecture que j'avais fais et que je t'aurais demander dans tout les cas. Pour le moment la première tache quie je te donne est de créer les classe modele suivante (elle n'auront pas de comportement
+## Entrées
 
-&#x20; donc des strcuts devrait suffire car plus légère) Player (un joueur avec un nom) Feature avec un id un titre et une optionnelle description et Card avec un label (string) et une value (int) nullable.
+### 2026-10-11 : Squelette de l'application, première version (US-01, US-03, US-05)
 
+- **Demande (résumé fidèle)** : produire un squelette qui saisit les joueurs, charge un backlog JSON, fait voter en secret puis révèle les votes, à partir du sujet et de nos user stories.
+- **Résultat** : rejeté
+- **Ce que nous avons vérifié** : le langage et l'organisation proposés, comparés à nos choix.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : la première proposition était en Python alors que notre langage est C# ; la seconde était une application console en C#, alors que nous avions choisi WPF avec le modèle MVVM. Les deux ont été rejetées ; le squelette a été refait par l'entrée suivante.
 
+### 2026-10-12 : Walking skeleton en C# / WPF : joueurs, vote et révélation (US-01, US-05)
 
-oui fais le renommage CAPI\_VIEW → CAPI\_APP et CAPI\_MODEL → CAPI\_CORE, supprime les fichiers des templates, et effectivement nous feront plus tard de la gestion d'erreurs sur les pseudos identiques et la valeurs des votes
+- **Demande (résumé fidèle)** : dans nos deux projets (CAPI_APP pour la vue et les view models, CAPI_CORE pour les modèles et la logique), en suivant nos conventions de code, créer les structs Player, Feature et Card, la classe GameSession (Vote, RevealVote) et une fenêtre WPF pour saisir les joueurs puis révéler les cartes, sans prendre d'initiative non demandée.
+- **Résultat** : modifié
+- **Ce que nous avons vérifié** : relecture des classes par le copilote avant fusion (PR #1) ; application lancée sous Windows : saisie des joueurs, vote, révélation.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : nous avons fait renommer CAPI_VIEW en CAPI_APP et CAPI_MODEL en CAPI_CORE et supprimer les fichiers des modèles de projet ; nous avons demandé `Equals` sur Player et Card pour préparer la détection des pseudos en double et la comparaison des votes.
 
-&#x20; via les cartes intègre leurs donc l'opérateur .Equals
+### 2026-10-13 : Projet de tests xUnit (configuration d'outil, US-06, US-07)
 
+- **Demande (résumé fidèle)** : créer le projet CAPI_TESTS (xUnit, .NET 10) qui référence seulement CAPI_CORE, pour tester le moteur sans lancer l'interface.
+- **Résultat** : modifié
+- **Ce que nous avons vérifié** : `dotnet test` fonctionne sur nos machines.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : la commande échouait (erreur NETSDK1045) car une machine n'avait que le SDK .NET 9 ; nous avons installé le SDK .NET 10 au lieu de baisser la version du projet.
 
+### 2026-10-13 : Fichier de CI GitHub Actions (US-06, US-07)
 
- pour connaitre si le vote est unanime et une méthode RevealVote qui renvoie le dictionnaire des votes si tout les player de la liste sont dans le dictionnaire des votes. Pour le moment c'est tout pour cette classe
+- **Demande (résumé fidèle)** : écrire un workflow qui lance les tests xUnit sur push et sur pull request vers main, avec des droits en lecture seule et des actions épinglées.
+- **Résultat** : modifié
+- **Ce que nous avons vérifié** : le premier run (CI #1) est rouge avec les 8 tests en échec, puis la CI passe au vert après l'implémentation du moteur (PR #15) ; chaque bloc du YAML est commenté.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : la CI tourne sous Linux et ne teste que CAPI_TESTS, car l'application WPF ne se compile que sous Windows ; nous avons retouché les commentaires du YAML pour qu'ils soient écrits avec nos mots.
 
-&#x20; ensuite tu fera un simple fenêtre WPF qui permet de lancer la partie en demandant de saisir les noms des joueurs jusque a validation et avoir le reveal des cartes. Fait donc les vue associées pour avoir ce simple
+### 2026-10-14 : Implémentation du moteur de règles (US-06, US-07)
 
-&#x20; comportement pour le moment
+- **Demande (résumé fidèle)** : implémenter les méthodes du moteur de règles (qui levaient toutes une exception) pour que nos tests passent, sans modifier les tests.
+- **Résultat** : modifié
+- **Ce que nous avons vérifié** : les 8 tests passent en local et dans la CI (PR #15) ; relecture du code par le copilote avant fusion.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : avec une liste de votes vide, `All()` renvoie vrai et le moteur aurait déclenché une pause café ; nous avons imposé un revote dans ce cas. La méthode `IsVoteUnanimous` de GameSession, devenue inutile car le moteur s'en charge, a été supprimée.
 
-\#PR1
-Je veux que tu déplace les commentaires en français du fichier de test unitaire pour les placer dans le readme a la racine du repo, tu peux indiquer pour chaque cas de test à quoi il correspond dans la table de décision
+### 2026-10-14 : Brancher le moteur sur l'interface (US-01, US-05, US-06, US-07)
 
-&#x20; (non disponible dans ce repo pour le moment)
-#US6 et 7 
-Implémente les méthodes du moteur de règle de vote (pour le momement elles lèves toutes des excception à leur appel) pour respecter les cas de test. Ne modifie pas les test fournis une implémentation qui passe les test.
-Pour le cas niche ou la liste est vide les tests plantent par sécurité en cas de lsite vide il faut toujours revote.
+- **Demande (résumé fidèle)** : relier le moteur au view model et à la vue en gardant le view model le plus léger possible, avec un backlog factice chargé au lancement ; puis un bouton de retour au menu avec confirmation, des messages explicites quand on revote à cause de « ? » ou du café, et le refus d'un pseudo déjà utilisé.
+- **Résultat** : accepté tel quel
+- **Ce que nous avons vérifié** : partie jouée à la main sous Windows avec les règles stricte et médiane, cartes « ? » et café, pseudo en double.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : rien à changer. Le backlog factice (`BacklogMock`) reste temporaire : il sera remplacé par le chargement du fichier JSON (US-03).
 
-Bien maintenant je veux que tu fasse le lien avec le ViewModel et la Vue tout court pour rendre fonctionnel le système de vote dans l'application elle même garde le VM aussi léger que possible, et créer un mock de backlog qui se charge au lancement de l'application affin que l'on puisse tester le moteur de règle.
+### 2026-10-15 : Code de production du sprint 2 : export JSON, carte café, sauvegarde et reprise (US-09, US-10, US-11)
 
-IsVoteUnanimous : n'est plus utilisé, le moteur s'en charge. Le supprimer ? Oui supprime le
+- **Demande (résumé fidèle)** : écrire l'export JSON final (difficulté de chaque fonctionnalité et règle choisie), la sauvegarde de la partie quand tous les joueurs jouent café (joueurs, règle, backlog, estimations, fonctionnalité courante) et la reprise depuis le menu.
+- **Résultat** : modifié
+- **Ce que nous avons vérifié** : `dotnet test` (16 tests verts) ; essai à la main sous Windows : F-01 validée à 3, café unanime sur F-02, sauvegarde, reprise sur F-02 au tour 1 avec les mêmes joueurs, puis export final où F-01 vaut toujours 3.
+- **Ce que nous avons changé ou rejeté, et pourquoi** : l'application ne compilait pas (erreur CS0103 sur `IOException`), car un projet WPF n'importe pas `System.IO` automatiquement ; nous avons ajouté `using System.IO;` dans `RevealViewModel.cs`. Nous avons décidé qu'une partie reprise recommence au tour 1 de la fonctionnalité courante (décision D-05).
 
-Ok je voudrais apporter des changement mineurs au fonctionnement de la vue. D'abord garder un bouton dans la reveal view et la voting view pour revenir à la setup view (revenir au menu avec perte de toute la progression en cours donc afficher une messagebox pour demander confirmation). Ensuite pour les cas ou l'on a juste un vote café ou un vote ? que le message afficher dans la reaveal view soit plus explicite (dire que l'on revote car il y'a la présence de la carte en question et dans le cas du vote ? préciser que le joueur ayant voter ? aimerais obtenir des explications)
+## Bilan (à compléter en séance 4, 3 lignes)
 
-Ajoute juste une petite logique de gestion des erreurs pour faire en sorte que l'on ne puisse pas ajouter un jouer ayant le même nom que un autre joueur deja présent dans la partie
-
+- Nombre d'entrées et de propositions rejetées ou corrigées :
+- Tâches où l'IA a fait gagner du temps :
+- Tâches où l'IA a fait perdre du temps :

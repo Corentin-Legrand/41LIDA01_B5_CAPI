@@ -16,8 +16,14 @@ public abstract partial class InGameViewModel : ObservableObject
     /// </summary>
     public event EventHandler? ReturnToSetupRequested;
 
+    /// <summary>
+    /// Leaves the running game and goes back to the setup screen.
+    /// </summary>
+    /// <remarks>
+    /// Modified by: Valentin Perroux (protected, so that a screen can end the game on its own after a save)
+    /// </remarks>
     [RelayCommand]
-    private void ReturnToSetup()
+    protected void ReturnToSetup()
     {
         ReturnToSetupRequested?.Invoke(this, EventArgs.Empty);
     }

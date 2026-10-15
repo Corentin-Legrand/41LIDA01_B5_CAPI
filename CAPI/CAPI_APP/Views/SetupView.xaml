@@ -49,6 +49,12 @@
             <Button Content="Lancer la partie" Command="{Binding StartGameCommand}"
                     Margin="0,20,0,0" Padding="12,8" HorizontalAlignment="Left" />
             <TextBlock Text="La partie demande au moins deux joueurs." Margin="0,6,0,0" Foreground="Gray" />
+
+            <TextBlock Text="Partie interrompue par une pause café ?" FontWeight="Bold" Margin="0,24,0,4" />
+            <Button Content="Reprendre une partie sauvegardée" Command="{Binding ResumeGameCommand}"
+                    Padding="12,8" HorizontalAlignment="Left" />
+            <TextBlock Text="Les joueurs, la règle et le backlog sont repris depuis la sauvegarde."
+                       Margin="0,6,0,0" Foreground="Gray" TextWrapping="Wrap" />
         </StackPanel>
 
         <StackPanel Grid.Column="2">
