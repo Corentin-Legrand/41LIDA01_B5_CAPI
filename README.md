@@ -24,9 +24,27 @@ Depuis la racine du dépôt :
 ```sh
 dotnet test CAPI/CAPI_TESTS/CAPI_TESTS.csproj
 ```
+## Fichiers JSON (US-09, US-10, US-11)
+
+Des exemples de chaque fichier se trouvent dans [`exemples/`](exemples/). La règle de jeu est stockée dans l'export et dans la sauvegarde, sous la clé `regle` : `strict` (unanimité) ou `mediane` (choisie dans le menu, appliquée à partir du deuxième tour).
+
+**Export final** ([`exemples/export-estimations.json`](exemples/export-estimations.json)) : quand toutes les fonctionnalités sont estimées, le bouton « Exporter les estimations (JSON) » enregistre la règle et, pour chaque fonctionnalité, son `id`, son `titre`, sa `description` (facultative) et sa `difficulte`.
+
+**Sauvegarde café** ([`exemples/sauvegarde-cafe.json`](exemples/sauvegarde-cafe.json)) : quand tous les joueurs jouent la carte café, le bouton « Sauvegarder la partie (JSON) » enregistre :
+
+| Clé | Contenu |
+|---|---|
+| `regle` | la règle de la partie |
+| `joueurs` | les pseudos, dans l'ordre de vote |
+| `fonctionnalites` | tout le backlog (`id`, `titre`, `description`) |
+| `estimations` | les fonctionnalités déjà validées (`id`, `difficulte`), dans l'ordre du backlog |
+| `fonctionnaliteCourante` | l'`id` de la fonctionnalité en cours, la première non estimée |
+
+**Reprise** : dans le menu, « Reprendre une partie sauvegardée » recharge ce fichier. La partie reprend au premier tour de la fonctionnalité courante, avec les mêmes joueurs et la même règle. Un fichier invalide (JSON mal formé, règle inconnue, moins de deux joueurs, fonctionnalité courante incohérente) est refusé avec un message, sans planter l'application.
+
 ## Tests du moteur de règles (US-06, US-07)
 
-Les tests de `CAPI/CAPI_TESTS/RuleEngineTests.cs` correspondent chacun à une ligne de la table de décision du moteur de règles (table non disponible dans ce dépôt pour le moment). Les tests nommés d'après un critère d'acceptation (CA) reprennent son identifiant ; les autres reprennent le numéro de la ligne.
+Les tests de `CAPI/CAPI_TESTS/RuleEngineTests.cs` correspondent chacun à une ligne de la table de décision du moteur de règles (voir le rendu R2 dans `docs/rendus/`). Les tests nommés d'après un critère d'acceptation (CA) reprennent son identifiant ; les autres reprennent le numéro de la ligne.
 
 | Ligne | Test | Règle | Tour | Cas | Résultat attendu |
 |---|---|---|---|---|---|

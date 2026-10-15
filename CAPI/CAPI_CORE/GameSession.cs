@@ -18,6 +18,7 @@ public class GameSession
     private readonly List<Feature> features = new();
     private readonly Dictionary<Feature, Card> estimates = new();
     private readonly RuleEngine ruleEngine;
+    private readonly IValidationRule rule;
     private int currentFeatureIndex = 0;
     // private readonly Backlog backlog = new(); // Enable once Backlog is implemented.
 
@@ -31,7 +32,64 @@ public class GameSession
     {
         this.players.AddRange(players);
         this.features.AddRange(features);
+        this.rule = rule;
         ruleEngine = new RuleEngine(rule);
+    }
+
+    /// <summary>
+    /// Initializes a <see cref="GameSession"/> resumed from a saved game: the given estimates are restored
+    /// and the game starts again at the first round of the first feature not estimated yet.
+    /// </summary>
+    /// <param name="players">The players taking part in the game.</param>
+    /// <param name="features">The features to estimate, in the order they are voted on.</param>
+    /// <param name="rule">The rule chosen to conclude the rounds from the second round onwards.</param>
+    /// <param name="estimates">
+    /// The card retained for each feature already validated. Features are estimated in order,
+    /// so these must be the first features of the backlog.
+    /// </param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the estimated features are not the first features of the backlog, in order.
+    /// </exception>
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    public GameSession(IEnumerable<Player> players, IEnumerable<Feature> features, IValidationRule rule,
+        IEnumerable<KeyValuePair<Feature, Card>> estimates)
+        : this(players, features, rule)
+    {
+        foreach (KeyValuePair<Feature, Card> estimate in estimates)
+        {
+            if (currentFeatureIndex >= this.features.Count || !this.features[currentFeatureIndex].Equals(estimate.Key))
+            {
+                throw new ArgumentException(
+                    "Les fonctionnalités estimées doivent être les premières du backlog, dans l'ordre.", nameof(estimates));
+            }
+
+            this.estimates[estimate.Key] = estimate.Value;
+            currentFeatureIndex++;
+        }
+    }
+
+    /// <summary>
+    /// Gets the features to estimate, in the order they are voted on.
+    /// </summary>
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    public IReadOnlyList<Feature> Features
+    {
+        get { return features; }
+    }
+
+    /// <summary>
+    /// Gets the rule chosen to conclude the rounds from the second round onwards.
+    /// </summary>
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    public IValidationRule Rule
+    {
+        get { return rule; }
     }
 
     /// <summary>

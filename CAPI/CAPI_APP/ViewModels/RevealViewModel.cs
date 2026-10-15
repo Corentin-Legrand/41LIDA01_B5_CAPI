@@ -1,5 +1,8 @@
+using System.IO;
+using CAPI_APP.Services;
 using CAPI_CORE;
 using CAPI_CORE.Rules;
+using CAPI_CORE.Storage;
 using CommunityToolkit.Mvvm.Input;
 
 namespace CAPI_APP.ViewModels;
@@ -13,6 +16,8 @@ namespace CAPI_APP.ViewModels;
 /// </remarks>
 public partial class RevealViewModel : InGameViewModel
 {
+    private readonly GameSession session;
+
     /// <summary>
     /// Gets the feature voted on during the revealed round.
     /// </summary>
@@ -32,6 +37,22 @@ public partial class RevealViewModel : InGameViewModel
     /// Gets a value indicating whether the game is over, because the backlog is estimated or the players asked for a coffee break.
     /// </summary>
     public bool HasGameEnded { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether every player played the coffee card, so the game can be saved.
+    /// </summary>
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    public bool IsCoffeeBreak { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether every feature of the backlog is estimated, so the estimates can be exported.
+    /// </summary>
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    public bool IsBacklogEstimated { get; }
 
     /// <summary>
     /// Gets the card retained for each feature validated so far.
@@ -69,10 +90,13 @@ public partial class RevealViewModel : InGameViewModel
     /// <param name="session">The game whose current round has been voted by every player.</param>
     public RevealViewModel(GameSession session)
     {
+        this.session = session;
         Feature = session.CurrentFeature;
         Votes = session.RevealVote();
         Result = session.ConcludeRound();
-        HasGameEnded = Result.Outcome == VoteOutcome.CoffeeBreak || session.IsBacklogEstimated;
+        IsCoffeeBreak = Result.Outcome == VoteOutcome.CoffeeBreak;
+        IsBacklogEstimated = session.IsBacklogEstimated;
+        HasGameEnded = IsCoffeeBreak || IsBacklogEstimated;
         Estimates = session.Estimates;
 
         bool isRevote = Result.Outcome == VoteOutcome.Revote;
@@ -91,5 +115,56 @@ public partial class RevealViewModel : InGameViewModel
     private void StartNextRound()
     {
         NextRoundRequested?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    [RelayCommand]
+    private void SaveGame()
+    {
+        string? path = DialogService.AskPathToSave("Sauvegarder la partie", "sauvegarde-capi.json");
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            GameStorage.SaveGame(session, path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            DialogService.ShowError($"La partie n'a pas pu être sauvegardée : {exception.Message}");
+            return;
+        }
+
+        DialogService.ShowInformation($"Partie sauvegardée dans {path}. Vous pourrez la reprendre depuis le menu.");
+        ReturnToSetup();
+    }
+
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    [RelayCommand]
+    private void ExportEstimates()
+    {
+        string? path = DialogService.AskPathToSave("Exporter les estimations", "estimations-capi.json");
+        if (path is null)
+        {
+            return;
+        }
+
+        try
+        {
+            GameStorage.ExportEstimates(session, path);
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            DialogService.ShowError($"Les estimations n'ont pas pu être exportées : {exception.Message}");
+            return;
+        }
+
+        DialogService.ShowInformation($"Estimations exportées dans {path}.");
     }
 }

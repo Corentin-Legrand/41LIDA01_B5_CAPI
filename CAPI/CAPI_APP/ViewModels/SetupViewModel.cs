@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using CAPI_APP.Services;
 using CAPI_CORE;
 using CAPI_CORE.Rules;
+using CAPI_CORE.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
@@ -86,5 +88,31 @@ public partial class SetupViewModel : ObservableObject
     private bool CanStartGame()
     {
         return Players.Count >= MinimumPlayerCount;
+    }
+
+    /// <remarks>
+    /// Author: Valentin Perroux
+    /// </remarks>
+    [RelayCommand]
+    private void ResumeGame()
+    {
+        string? path = DialogService.AskPathToOpen("Reprendre une partie sauvegardée");
+        if (path is null)
+        {
+            return;
+        }
+
+        GameSession session;
+        try
+        {
+            session = GameStorage.LoadGame(path);
+        }
+        catch (InvalidSaveFileException exception)
+        {
+            DialogService.ShowError($"Cette sauvegarde ne peut pas être reprise : {exception.Message}");
+            return;
+        }
+
+        GameStarted?.Invoke(this, session);
     }
 }

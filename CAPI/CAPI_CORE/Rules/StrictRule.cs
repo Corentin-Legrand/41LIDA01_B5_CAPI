@@ -9,6 +9,12 @@ namespace CAPI_CORE.Rules;
 public class StrictRule : IValidationRule
 {
     /// <inheritdoc />
+    public string Name
+    {
+        get { return ValidationRules.StrictRuleName; }
+    }
+
+    /// <inheritdoc />
     public VoteResult Evaluate(IReadOnlyList<Card> votes)
     {
         Card first = votes[0];
